@@ -1,0 +1,25 @@
+# ── Core framework ────────────────────────────────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+
+# ── LangChain stack ───────────────────────────────────────────────────────────
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-huggingface>=0.1.0
+langchain-chroma>=0.1.4
+langchain-text-splitters>=0.3.0
+
+# ── Vector store ──────────────────────────────────────────────────────────────
+chromadb>=0.5.0
+
+# ── Embeddings ────────────────────────────────────────────────────────────────
+sentence-transformers>=3.0.0
+
+# ── HuggingFace inference ─────────────────────────────────────────────────────
+huggingface-hub>=0.24.0
+
+# ── YouTube transcript ────────────────────────────────────────────────────────
+youtube-transcript-api>=0.6.3
