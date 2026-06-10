@@ -1,15 +1,19 @@
 """
 Transcript service — fetches, splits, embeds, and caches a YouTube transcript
-into a per-video-id Chroma vector store so that repeated queries on the same
+into a per-video-id in-memory vector store so that repeated queries on the same
 video do NOT re-embed the transcript.
+
+Embeddings are produced via the HuggingFace Inference API (no local model
+weights) so the deployment stays well within Vercel's 500 MB Lambda limit.
 """
 
 import logging
 from threading import Lock
 from typing import Dict
 
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from huggingface_hub import InferenceClient
+from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from youtube_transcript_api import (
     NoTranscriptFound,
@@ -22,17 +26,46 @@ from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
-# In-process cache: video_id → Chroma retriever
-_store_cache: Dict[str, Chroma] = {}
+
+class _HFInferenceEmbeddings(Embeddings):
+    """Calls the HuggingFace feature-extraction API; no local model weights.
+
+    Uses huggingface_hub.InferenceClient directly — avoids the deprecated
+    langchain-community wrapper and keeps the Vercel bundle under 500 MB.
+    """
+
+    def __init__(self, api_key: str, model: str) -> None:
+        self._client = InferenceClient(token=api_key)
+        self._model = model
+
+    def _embed(self, text: str) -> list[float]:
+        raw = self._client.feature_extraction(text, model=self._model)
+        if hasattr(raw, "tolist"):
+            raw = raw.tolist()
+        # Sentence models return a 1-D list; token-level models return 2-D.
+        # Apply mean pooling over the token dimension when needed.
+        if raw and isinstance(raw[0], list):
+            n = len(raw)
+            return [sum(row[i] for row in raw) / n for i in range(len(raw[0]))]
+        return raw
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [self._embed(t) for t in texts]
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed(text)
+
+
+# In-process cache: video_id → InMemoryVectorStore
+_store_cache: Dict[str, InMemoryVectorStore] = {}
 _cache_lock = Lock()
 
 
-def _build_embeddings(settings: Settings) -> HuggingFaceEmbeddings:
-    """Construct the HuggingFace embedding model (CPU-friendly defaults)."""
-    return HuggingFaceEmbeddings(
-        model_name=settings.embedding_model,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
+def _build_embeddings(settings: Settings) -> _HFInferenceEmbeddings:
+    """Use HuggingFace Inference API for embeddings — no local model weights."""
+    return _HFInferenceEmbeddings(
+        api_key=settings.huggingface_api_key,
+        model=settings.embedding_model,
     )
 
 
@@ -103,7 +136,7 @@ def get_or_build_retriever(video_id: str, language: str, settings: Settings):
         raise ValueError(f"Transcript for video '{video_id}' produced no text chunks.")
 
     embeddings = _build_embeddings(settings)
-    vector_store = Chroma.from_documents(chunks, embeddings)
+    vector_store = InMemoryVectorStore.from_documents(chunks, embeddings)
 
     with _cache_lock:
         _store_cache[cache_key] = vector_store

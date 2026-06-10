@@ -8,17 +8,12 @@ pydantic-settings[dotenv]>=2.3.0
 langchain>=0.3.0
 langchain-core>=0.3.0
 langchain-community>=0.3.0
-langchain-huggingface>=0.1.0
-langchain-chroma>=0.1.4
 langchain-text-splitters>=0.3.0
 
-# ── Vector store ──────────────────────────────────────────────────────────────
-chromadb>=0.5.0
-
-# ── Embeddings ────────────────────────────────────────────────────────────────
-sentence-transformers>=3.0.0
-
 # ── HuggingFace inference ─────────────────────────────────────────────────────
+# NOTE: sentence-transformers/torch/chromadb are intentionally omitted —
+# they push the bundle far beyond Vercel's 500 MB Lambda limit.
+# Embeddings are produced via the HuggingFace Inference API instead.
 huggingface-hub>=0.24.0
 
 # ── YouTube transcript ────────────────────────────────────────────────────────
