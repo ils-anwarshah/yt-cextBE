@@ -2,7 +2,7 @@
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 pydantic>=2.7.0
-pydantic-settings>=2.3.0
+pydantic-settings[dotenv]>=2.3.0
 
 # ── LangChain stack ───────────────────────────────────────────────────────────
 langchain>=0.3.0
@@ -23,3 +23,6 @@ huggingface-hub>=0.24.0
 
 # ── YouTube transcript ────────────────────────────────────────────────────────
 youtube-transcript-api>=0.6.3
+
+# ── Async HTTP (required by AsyncInferenceClient) ─────────────────────────────
+aiohttp>=3.9.0

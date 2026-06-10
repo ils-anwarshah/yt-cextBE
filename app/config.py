@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     max_new_tokens: int = 1024
 
     # ── Embeddings ───────────────────────────────────────────────────────────
-    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
 
     # ── Text splitter ────────────────────────────────────────────────────────
     chunk_size: int = 1000

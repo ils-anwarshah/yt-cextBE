@@ -1,5 +1,7 @@
 # Ignore secrets
 .env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
@@ -22,3 +24,24 @@ chroma_data/
 # IDE
 .vscode/
 .idea/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking
+.mypy_cache/
+.ruff_cache/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
