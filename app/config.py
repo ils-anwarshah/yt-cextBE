@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # ── Retriever ────────────────────────────────────────────────────────────
     retriever_k: int = 10
 
+    # ── Proxy (optional — leave unset to connect directly) ──────────────────
+    proxy_username: str = ""
+    proxy_password: str = ""
+
     # ── CORS (comma-separated list of allowed origins) ───────────────────────
     cors_origins: str = "*"
 

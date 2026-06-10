@@ -38,3 +38,18 @@ class HealthResponse(BaseModel):
     """Simple liveness/readiness probe response."""
 
     status: str = "ok"
+
+
+class TranscriptLanguage(BaseModel):
+    """A single available transcript language for a video."""
+
+    code: str = Field(description="BCP-47 language code, e.g. 'en', 'hi'")
+    name: str = Field(description="Human-readable language name, e.g. 'English'")
+    is_generated: bool = Field(description="True if auto-generated, False if manually captioned")
+
+
+class LanguagesResponse(BaseModel):
+    """Available transcript languages for a YouTube video."""
+
+    video_id: str
+    languages: list[TranscriptLanguage]

@@ -22,7 +22,7 @@ on the provided context from a YouTube video transcript.
 
 Rules:
 - Only use information present in the context below.
-- If the answer is not in the context, respond with: "I don't know based on the provided transcript."
+- If the answer is not in the context or different from greeting, respond with: "I don't know based on the provided transcript."
 - Be concise and accurate.
 
 Context:
