@@ -3,7 +3,7 @@ Application entry point.
 
 Start the server with:
     uvicorn app.main:app --reload            # development
-    uvicorn app.main:app --host 0.0.0.0 \   # production
+    uvicorn app.main:app --host 0.0.0.0      # production
         --port 8000 --workers 2
 """
 
@@ -12,9 +12,16 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+print("Loading config")
 from app.config import get_settings
+
+print("Loading schemas")
 from app.models.schemas import HealthResponse
+
+print("Loading chat router")
 from app.routes import chat
+
+print("Imports completed")
 
 # ---------------------------------------------------------------------------
 # Logging
